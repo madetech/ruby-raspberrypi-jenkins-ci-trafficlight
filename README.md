@@ -1,6 +1,6 @@
 #Jenkins CI Traffic Light for Raspberry Pi
 
-A script that will will emulate a traffic light for your overall jenkins build status, Green for all passed, Amber (flashing) for building and Red for a failure.
+Once a complete circuit has been made this script that will will emulate a traffic light for your overall jenkins build status, Green for all passed, Amber (flashing) for building and Red for a failure.
 
 ###Prerequisites
 * Raspbian “wheezy” > 2013-05-25
@@ -14,6 +14,7 @@ If you don't have Ruby installed on your Pi follow this [guide](http://elinux.or
 * `bundle install`
 * Rename sample_config.rb to config.rb
 * Enter your creditials
+* Set GPiO pin numbers
 * Set up circuit
 * run `ruby jenkins.rb`
 
