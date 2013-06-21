@@ -4,7 +4,9 @@ require "active_support/core_ext/numeric/time"
 require "net/https"
 require "uri"
 require "json"
-require "config.rb"
+require "pi_piper"
+require "./config.rb"
+include PiPiper
 
 class Jenkins
   USERNAME = Config::USERNAME
@@ -22,36 +24,28 @@ class Jenkins
     response.body
   end
 
-  def self.failing_count(jobs)
+  def self.get_status_count(jobs, regex)
     count = 0
     jobs.each do |job|
-      count+=1 if (job["color"].match(/yellow|yellow_anime|red|red_anime/))
+      count+=1 if (job["color"].match(regex))
     end
     count
+  end
+
+  def self.failing_count(jobs)
+    self.get_status_count(jobs,/yellow|yellow_anime|red|red_anime/)
   end
 
   def self.building_count(jobs)
-    count = 0
-    jobs.each do |job|
-      count+=1 if (job["color"].match(/blue_anime|yellow_anime|red_anime/))
-    end
-    count
+    self.get_status_count(jobs,/blue_anime|yellow_anime|red_anime/)
   end
 
   def self.passing_count(jobs)
-    count = 0
-    jobs.each do |job|
-      count+=1 if (job["color"].match(/blue|blue_anime/))
-    end
-    count
+    self.get_status_count(jobs,/blue|blue_anime/)
   end
 
   def self.disabled_count(jobs)
-    count = 0
-    jobs.each do |job|
-      count+=1 if (job["color"].match(/grey|disabled/))
-    end
-    count
+    self.get_status_count(jobs,/grey|disabled/)
   end
 
   def self.get_metrics
@@ -121,12 +115,12 @@ class RaspberryPi
   end
 end
 
-loop do
-  colour = TrafficLight::get_colours
+red_pin = PiPiper::Pin.new(:pin => RaspberryPi::RED_PIN_NUMBER, :direction => :out)
+amber_pin = PiPiper::Pin.new(:pin => RaspberryPi::AMBER_PIN_NUMBER, :direction => :out)
+green_pin = PiPiper::Pin.new(:pin => RaspberryPi::GREEN_PIN_NUMBER, :direction => :out)
 
-  red_pin = PiPiper::Pin.new(:pin => RaspberryPi::RED_PIN_NUMBER, :direction => :out)
-  amber_pin = PiPiper::Pin.new(:pin => RaspberryPi::AMBER_PIN_NUMBER, :direction => :out)
-  green_pin = PiPiper::Pin.new(:pin => RaspberryPi::GREEN_PIN_NUMBER, :direction => :out)
+loop do
+  colours = TrafficLight::get_colours
 
   if colours[:red] and colours[:amber]
     RaspberryPi::show_fail_building(red_pin, amber_pin)
