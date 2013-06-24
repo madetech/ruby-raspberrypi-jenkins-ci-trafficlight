@@ -33,19 +33,19 @@ class Jenkins
   end
 
   def self.failing_count(jobs)
-    self.get_status_count(jobs,/yellow|yellow_anime|red|red_anime/)
+    self.get_status_count(jobs, /yellow|yellow_anime|red|red_anime/)
   end
 
   def self.building_count(jobs)
-    self.get_status_count(jobs,/blue_anime|yellow_anime|red_anime/)
+    self.get_status_count(jobs, /blue_anime|yellow_anime|red_anime/)
   end
 
   def self.passing_count(jobs)
-    self.get_status_count(jobs,/blue|blue_anime/)
+    self.get_status_count(jobs, /blue|blue_anime/)
   end
 
   def self.disabled_count(jobs)
-    self.get_status_count(jobs,/grey|disabled/)
+    self.get_status_count(jobs, /grey|disabled/)
   end
 
   def self.get_metrics
