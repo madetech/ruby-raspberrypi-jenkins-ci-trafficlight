@@ -2,6 +2,8 @@
 
 Once a complete circuit has been made this script that will will emulate a traffic light for your overall jenkins build status, Green for all passed, Amber (flashing) for building and Red for a failure.
 
+Currently the only authorisation method supported is basic http authentication.
+
 ###Prerequisites
 * Raspbian “wheezy” > 2013-05-25
 * Ruby == 1.9.3
@@ -18,5 +20,11 @@ If you don't have Ruby installed on your Pi follow this [guide](http://elinux.or
 * Set up circuit
 * run `ruby jenkins.rb`
 
+###Circuit Diagram
+[Jenkins CI Traffic Light for Raspberry Pi Circuit Diagram](//github.com/madebymade/jquery-navobile/blob/master/circuit.png)
+
 ###License
 Licensed under [New BSD License](https://github.com/madebymade/jquery-navobile/blob/master/license.txt)
+
+###To Do
+- [ ] Add more auth methods
