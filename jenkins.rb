@@ -6,7 +6,7 @@ require "uri"
 require "json"
 require "pi_piper"
 require "./config.rb"
-include PiPiper
+
 
 class Jenkins
   USERNAME = Config::USERNAME
