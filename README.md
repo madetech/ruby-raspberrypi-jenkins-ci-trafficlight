@@ -17,7 +17,7 @@ If you don't have Ruby installed on your Pi follow this [guide](http://elinux.or
 * Rename sample_config.rb to config.rb
 * Enter your creditials
 * Set GPiO pin numbers
-* Set up circuit
+* Setup circuit
 * run `ruby jenkins.rb`
 
 ###Circuit Diagram
