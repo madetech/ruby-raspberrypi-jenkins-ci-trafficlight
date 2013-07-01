@@ -17,11 +17,11 @@ If you don't have Ruby installed on your Pi follow this [guide](http://elinux.or
 * Rename sample_config.rb to config.rb
 * Enter your creditials
 * Set GPiO pin numbers
-* Set up circuit
+* Setup circuit
 * run `ruby jenkins.rb`
 
 ###Circuit Diagram
-[Jenkins CI Traffic Light for Raspberry Pi Circuit Diagram](//github.com/madebymade/ruby-raspberrypi-jenkins-ci-trafficlight/blob/master/circuit.png)
+![Jenkins CI Traffic Light for Raspberry Pi Circuit Diagram](https://raw.github.com/madebymade/ruby-raspberrypi-jenkins-ci-trafficlight/master/circuit.png)
 
 ###License
 Licensed under [New BSD License](https://github.com/madebymade/jquery-navobile/blob/master/license.txt)
