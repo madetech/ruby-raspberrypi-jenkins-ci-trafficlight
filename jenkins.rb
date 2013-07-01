@@ -80,59 +80,65 @@ class RaspberryPi
   AMBER_PIN_NUMBER = 2
   GREEN_PIN_NUMBER = 3
 
-  def self.show_fail(red_pin)
-    red_pin.on
+  def self.show_fail(pins)
+    pins[:red].on
+    pins[:amber].off
+    pins[:green].off
+
     sleep SLEEP_TIME.to_i
-    red_pin.off
   end
 
-  def self.show_fail_building(red_pin, amber_pin)
-    red_pin.on
+  def self.show_fail_building(pins)
+    pins[:red].on
+    pins[:amber].off
+    pins[:green].off
+
     NUMBER_OF_FLASHES.times do
-      amber_pin.on
+      pins[:amber].on
       sleep BLINK_INTERVAL.to_i
-      amber_pin.off
+      pins[:amber].off
       sleep BLINK_INTERVAL.to_i
     end
-    red_pin.off
   end
 
-  def self.show_pass(green_pin)
-    green_pin.on
+  def self.show_pass(pins)
+    pins[:red].off
+    pins[:amber].off
+    pins[:green].on
+
     sleep SLEEP_TIME.to_i
-    green_pin.off
   end
 
-  def self.show_pass_building(green_pin, amber_pin)
-    green_pin.on
+  def self.show_pass_building(pins)
+    pins[:red].off
+    pins[:amber].off
+    pins[:green].on
+
     NUMBER_OF_FLASHES.times do
-      amber_pin.on
+      pins[:amber].on
       sleep BLINK_INTERVAL.to_i
-      amber_pin.off
+      pins[:amber].off
       sleep BLINK_INTERVAL.to_i
     end
-    green_pin.off
   end
 end
 
-red_pin = PiPiper::Pin.new(:pin => RaspberryPi::RED_PIN_NUMBER, :direction => :out)
-amber_pin = PiPiper::Pin.new(:pin => RaspberryPi::AMBER_PIN_NUMBER, :direction => :out)
-green_pin = PiPiper::Pin.new(:pin => RaspberryPi::GREEN_PIN_NUMBER, :direction => :out)
+pins = {
+  :red => PiPiper::Pin.new(:pin => RaspberryPi::RED_PIN_NUMBER, :direction => :out),
+  :amber => PiPiper::Pin.new(:pin => RaspberryPi::AMBER_PIN_NUMBER, :direction => :out),
+  :green => PiPiper::Pin.new(:pin => RaspberryPi::GREEN_PIN_NUMBER, :direction => :out)
+}
 
 loop do
   colours = TrafficLight::get_colours
 
   if colours[:red] and colours[:amber]
-    RaspberryPi::show_fail_building(red_pin, amber_pin)
+    RaspberryPi::show_fail_building(pins)
   elsif colours[:green] and colours[:amber]
-    RaspberryPi::show_pass_building(green_pin, amber_pin)
+    RaspberryPi::show_pass_building(pins)
   elsif colours[:green]
-    RaspberryPi::show_pass(green_pin)
+    RaspberryPi::show_pass(pins)
   else
-    RaspberryPi::show_fail(red_pin)
+    RaspberryPi::show_fail(pins)
   end
-
-  red_pin.off
-  amber_pin.off
-  green_pin.off
 end
