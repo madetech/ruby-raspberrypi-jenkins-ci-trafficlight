@@ -28,4 +28,4 @@ Licensed under [New BSD License](https://github.com/madebymade/jquery-navobile/b
 
 ###To Do
 - [ ] Add more auth methods
-- [ ] Add "back off" for http connection error
+- [x] Add "back off" for http connection error
