@@ -4,24 +4,34 @@ require "active_support/core_ext/numeric/time"
 require "net/https"
 require "uri"
 require "json"
+require 'retry_block'
 require "pi_piper"
 require "./config.rb"
-
 
 class Jenkins
   USERNAME = Config::USERNAME
   PASSWORD = Config::PASSWORD
   JENKINS_JSON_URL = Config::JENKINS_JSON_URL
+  MAX_BACKOFF_ELAPSE = 5.minutes.to_i
+  MAX_BACKOFF_ATTEMPTS = 100
 
   def self.get_api_json
-    uri = URI.parse(JENKINS_JSON_URL)
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    request = Net::HTTP::Get.new(uri.request_uri)
-    request.basic_auth(USERNAME, PASSWORD)
-    response = http.request(request)
-    response.body
+    backoff = lambda do |attempt|
+      raise if attempt > MAX_BACKOFF_ATTEMPTS
+      sleep_time = [MAX_BACKOFF_ELAPSE, 2**(attempt-1)].min
+      sleep sleep_time
+    end
+
+    retry_block(:do_not_catch => Interrupt, :fail_callback => backoff) do |attempt|
+      uri = URI.parse(JENKINS_JSON_URL)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      request = Net::HTTP::Get.new(uri.request_uri)
+      request.basic_auth(USERNAME, PASSWORD)
+      response = http.request(request)
+      response.body
+    end
   end
 
   def self.get_status_count(jobs, regex)
