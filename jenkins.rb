@@ -13,7 +13,7 @@ class Jenkins
   PASSWORD = Config::PASSWORD
   JENKINS_JSON_URL = Config::JENKINS_JSON_URL
   MAX_BACKOFF_ELAPSE = 5.minutes.to_i
-  MAX_BACKOFF_ATTEMPTS = 100
+  MAX_BACKOFF_ATTEMPTS = 30
 
   def self.get_api_json
     backoff = lambda do |attempt|
