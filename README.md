@@ -16,6 +16,7 @@ If you don't have Ruby installed on your Pi follow this [guide](http://elinux.or
 * `bundle install`
 * Rename sample_config.rb to config.rb
 * Enter your credentials, and server url
+* Specify Authentication method, either `:basic` or `:password`
 * Set GPiO pin numbers
 * Setup circuit
 * run `ruby jenkins.rb`
