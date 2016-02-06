@@ -7,34 +7,54 @@ require "json"
 require 'retry_block'
 require "pi_piper"
 require "./config.rb"
+require 'jenkins_api_client'
 
-class Jenkins
+module JenkinsStatus
+  extend self
+
   USERNAME = Config::USERNAME
   PASSWORD = Config::PASSWORD
-  MAX_BACKOFF_ELAPSE = 5.minutes.to_i
   JENKINS_JSON_URL = "#{Config::SERVER_URL}/api/json"
+  MAX_BACKOFF_ELAPSE = 5.minutes.to_i
   MAX_BACKOFF_ATTEMPTS = 30
 
-  def self.get_api_json
+  def get_api_json
     backoff = lambda do |attempt|
       raise if attempt > MAX_BACKOFF_ATTEMPTS
       sleep_time = [MAX_BACKOFF_ELAPSE, 2**(attempt-1)].min
       sleep sleep_time
+  MAX_BACKOFF_ELAPSE = 5.minutes.to_i
     end
 
     retry_block(:do_not_catch => Interrupt, :fail_callback => backoff) do |attempt|
-      uri = URI.parse(JENKINS_JSON_URL)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      request = Net::HTTP::Get.new(uri.request_uri)
-      request.basic_auth(USERNAME, PASSWORD)
-      response = http.request(request)
-      response.body
+      call_jenkins
     end
   end
 
-  def self.get_status_count(jobs, regex)
+  def call_jenkins
+    case Config::AUTH_METHOD
+    when :basic
+      basic_auth_body
+    when :password
+      JenkinsApi::Client.new(
+        server_url: Config::SERVER_URL,
+        username: Config::USERNAME,
+        password: Config::PASSWORD).view.list_jobs_with_details('All')
+    end
+  end
+
+  def basic_auth_body
+    uri = URI.parse(JENKINS_JSON_URL)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    request = Net::HTTP::Get.new(uri.request_uri)
+    request.basic_auth(USERNAME, PASSWORD)
+    response = http.request(request)
+    response.body
+  end
+
+  def get_status_count(jobs, regex)
     count = 0
     jobs.each do |job|
       count+=1 if (job["color"].match(regex))
@@ -42,37 +62,37 @@ class Jenkins
     count
   end
 
-  def self.failing_count(jobs)
-    self.get_status_count(jobs, /yellow|yellow_anime|red|red_anime/)
+  def failing_count(jobs)
+    get_status_count(jobs, /yellow|yellow_anime|red|red_anime/)
   end
 
-  def self.building_count(jobs)
-    self.get_status_count(jobs, /blue_anime|yellow_anime|red_anime/)
+  def building_count(jobs)
+    get_status_count(jobs, /blue_anime|yellow_anime|red_anime/)
   end
 
-  def self.passing_count(jobs)
-    self.get_status_count(jobs, /blue|blue_anime/)
+  def passing_count(jobs)
+    get_status_count(jobs, /blue|blue_anime/)
   end
 
-  def self.disabled_count(jobs)
-    self.get_status_count(jobs, /grey|disabled/)
+  def disabled_count(jobs)
+    get_status_count(jobs, /grey|disabled/)
   end
 
-  def self.get_metrics
-    json = JSON.parse(self.get_api_json)
+  def get_metrics
+    json = JSON.parse(get_api_json)
 
     {
-      :building => self.building_count(json["jobs"]),
-      :disabled => self.disabled_count(json["jobs"]),
-      :failing => self.failing_count(json["jobs"]),
-      :passing => self.passing_count(json["jobs"])
+      :building => building_count(json["jobs"]),
+      :disabled => disabled_count(json["jobs"]),
+      :failing => failing_count(json["jobs"]),
+      :passing => passing_count(json["jobs"])
     }
   end
 end
 
 class TrafficLight
   def self.get_colours
-    jenkins = Jenkins::get_metrics
+    jenkins = Jenkins.get_metrics
 
     {
       :red => (true if jenkins[:failing] > 0),
