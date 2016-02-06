@@ -15,7 +15,7 @@ If you don't have Ruby installed on your Pi follow this [guide](http://elinux.or
 * `gem install bundler` if you don't already have it installed
 * `bundle install`
 * Rename sample_config.rb to config.rb
-* Enter your creditials
+* Enter your credentials, and server url
 * Set GPiO pin numbers
 * Setup circuit
 * run `ruby jenkins.rb`
