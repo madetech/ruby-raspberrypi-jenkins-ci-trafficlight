@@ -11,8 +11,8 @@ require "./config.rb"
 class Jenkins
   USERNAME = Config::USERNAME
   PASSWORD = Config::PASSWORD
-  JENKINS_JSON_URL = Config::JENKINS_JSON_URL
   MAX_BACKOFF_ELAPSE = 5.minutes.to_i
+  JENKINS_JSON_URL = "#{Config::SERVER_URL}/api/json"
   MAX_BACKOFF_ATTEMPTS = 30
 
   def self.get_api_json
